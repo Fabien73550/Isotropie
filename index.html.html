@@ -48,26 +48,34 @@ var LVL = [
 
 // ── Palette (fond beige chaud + tons C harmonises) ───────────────────────────────
 var CLR = {
-  work:    { m:"#1E5FA3", d:"#CBB99E", g:"rgba(30,95,163,0.25)" },   // cobalt
-  restSet: { m:"#0A8A63", d:"#CBB99E", g:"rgba(10,138,99,0.25)" },   // jade
-  restEx:  { m:"#6B4FB8", d:"#CBB99E", g:"rgba(107,79,184,0.25)" }   // violet
+  work:    { m:"#1E5FA3", d:"#CBB99E", g:"rgba(30,95,163,0.25)" },
+  restSet: { m:"#0A8A63", d:"#CBB99E", g:"rgba(10,138,99,0.25)" },
+  restEx:  { m:"#6B4FB8", d:"#CBB99E", g:"rgba(107,79,184,0.25)" }
 };
-var BG   = "#F2E9DC";  // beige chaud leger
-var SF   = "#FBF6EE";  // carte creme
-var TX   = "#3A332A";  // brun fonce chaud (texte principal)
-var DM   = "#8A7E6C";  // brun moyen doux (texte secondaire)
-var SOFT = "#E4D7C3";  // beige plus fonce (separateurs / inactifs)
-var ZH   = "#6B4FB8";  // violet pour le chinois (harmonise restEx)
+var BG   = "#F2E9DC";
+var SF   = "#FBF6EE";
+var TX   = "#3A332A";
+var DM   = "#8A7E6C";
+var SOFT = "#E4D7C3";
+var ZH   = "#6B4FB8";
 
 // ── Audio ──────────────────────────────────────────────────────────────────────
 var _ac=null;
 function getCtx(){ if(!_ac) _ac=new (window.AudioContext||window.webkitAudioContext)(); if(_ac.state==="suspended")_ac.resume(); return _ac; }
-function bip(freq,dur,vol){ try{ var ctx=getCtx(); var o=ctx.createOscillator(); var g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=freq; g.gain.setValueAtTime(vol,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur); o.start(); o.stop(ctx.currentTime+dur); }catch(e){} }
-function chime(){ [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){ bip(f,0.45,0.3); }, i*190); }); }
+// bip court (note qui s'eteint)
+function bip(freq,dur,vol){ try{ var c=getCtx(); var o=c.createOscillator(); var g=c.createGain(); o.type="sine"; o.connect(g); g.connect(c.destination); o.frequency.value=freq; var t=c.currentTime; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+0.012); g.gain.exponentialRampToValueAtTime(0.0001,t+dur); o.start(t); o.stop(t+dur+0.02); }catch(e){} }
+// biiip tenu (volume constant)
+function held(freq,dur,vol){ try{ var c=getCtx(); var o=c.createOscillator(); var g=c.createGain(); o.type="sine"; o.connect(g); g.connect(c.destination); o.frequency.value=freq; var t=c.currentTime; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+0.02); g.gain.setValueAtTime(vol,t+dur-0.08); g.gain.exponentialRampToValueAtTime(0.0001,t+dur); o.start(t); o.stop(t+dur+0.02); }catch(e){} }
+// son de depart : bip + bip + biiiiiip aigu tenu 1.5s
+function startSound(){ bip(660,0.14,0.32); setTimeout(function(){bip(660,0.14,0.32);},320); setTimeout(function(){held(990,1.5,0.4);},640); }
+// note de fin de decompte (le 0) : biiip tenu 0.8s octave haute
+function zeroSound(){ held(1047,0.8,0.4); }
+// decompte 4->0 : octaves qui montent
+var UP_NOTES = { 4:392, 3:523, 2:659, 1:784 };
 function vibe(p){ try{ if(navigator.vibrate)navigator.vibrate(p); }catch(e){} }
 
 // ── Etat global ─────────────────────────────────────────────────────────────────
-var S = { screen:"home", week:1, exIdx:0, setIdx:0, phase:"work", tl:0, paused:false, done:false };
+var S = { screen:"home", week:1, exIdx:0, setIdx:0, phase:"work", tl:0, paused:false, done:false, running:false };
 var timer=null;
 var app = document.getElementById("app");
 
@@ -137,7 +145,7 @@ function renderHome(){
   }
   h+='</div>'
     + '<button onclick="showGuide()" style="width:100%;padding:14px;border-radius:14px;border:1.5px solid '+CLR.work.m+';background:'+SF+';color:'+CLR.work.m+';font-size:14px;font-weight:600;margin-bottom:12px;">\uD83D\uDCD6  Guide des postures</button>'
-    + '<button onclick="startSession()" style="width:100%;padding:17px;border-radius:16px;border:none;background:'+CLR.work.m+';color:#fff;font-size:15px;font-weight:700;letter-spacing:0.06em;box-shadow:0 6px 20px '+CLR.work.g+';">DEMARRER - Semaine '+S.week+'</button>'
+    + '<button onclick="prepareSession()" style="width:100%;padding:17px;border-radius:16px;border:none;background:'+CLR.work.m+';color:#fff;font-size:15px;font-weight:700;letter-spacing:0.06em;box-shadow:0 6px 20px '+CLR.work.g+';">DEMARRER - Semaine '+S.week+'</button>'
     + '<div style="display:flex;gap:16px;justify-content:center;margin-top:18px;flex-wrap:wrap;">';
   var leg=[["Travail","work"],["Repos serie","restSet"],["Repos exercice","restEx"]];
   for(var k=0;k<leg.length;k++){
@@ -147,7 +155,7 @@ function renderHome(){
   app.innerHTML=h;
 }
 
-// ── Ecran guide (descriptions des postures) ──────────────────────────────────────
+// ── Ecran guide ──────────────────────────────────────────────────────────────────
 function renderGuide(){
   var h='<div style="min-height:100vh;background:'+BG+';color:'+TX+';padding:24px 16px;">'
     + '<div style="max-width:400px;margin:0 auto;">'
@@ -175,7 +183,24 @@ function renderGuide(){
       + '</div>'
       + '</div>';
   }
-  h+='<button onclick="startSession()" style="width:100%;padding:16px;border-radius:14px;border:none;background:'+CLR.work.m+';color:#fff;font-size:15px;font-weight:700;box-shadow:0 6px 20px '+CLR.work.g+';margin-top:4px;">DEMARRER LA SEANCE</button>'
+  h+='<button onclick="prepareSession()" style="width:100%;padding:16px;border-radius:14px;border:none;background:'+CLR.work.m+';color:#fff;font-size:15px;font-weight:700;box-shadow:0 6px 20px '+CLR.work.g+';margin-top:4px;">DEMARRER LA SEANCE</button>'
+    + '</div></div>';
+  app.innerHTML=h;
+}
+
+// ── Ecran pret (demarrage manuel) ────────────────────────────────────────────────
+function renderReady(){
+  var e=EX[0];
+  var l=LVL[0][S.week-1];
+  var h='<div style="min-height:100vh;background:'+BG+';color:'+TX+';display:flex;align-items:center;justify-content:center;padding:24px 16px;">'
+    + '<div style="max-width:400px;width:100%;text-align:center;">'
+    + '<p style="font-size:11px;color:'+DM+';margin:0 0 4px;text-transform:uppercase;letter-spacing:0.14em;">Semaine '+S.week+' - Premier exercice</p>'
+    + '<div style="font-size:56px;line-height:1.1;margin:10px 0;">'+e.em+'</div>'
+    + '<h2 style="margin:2px 0 2px;font-size:23px;font-weight:600;color:'+TX+';">'+e.name+'</h2>'
+    + '<p style="margin:0 0 6px;font-size:26px;color:'+ZH+';font-weight:700;">'+e.zh+'</p>'
+    + '<p style="margin:0 0 28px;font-size:13px;color:'+DM+';">'+l.s+' series x '+l.w+'s - repos '+l.r+'s</p>'
+    + '<button onclick="beginSession()" style="width:100%;padding:18px;border-radius:16px;border:none;background:'+CLR.work.m+';color:#fff;font-size:16px;font-weight:700;letter-spacing:0.08em;box-shadow:0 6px 22px '+CLR.work.g+';">\u25B6  COMMENCER</button>'
+    + '<button onclick="goHome()" style="width:100%;padding:13px;border-radius:14px;border:none;background:transparent;color:'+DM+';font-size:13px;font-weight:500;margin-top:10px;">Retour</button>'
     + '</div></div>';
   app.innerHTML=h;
 }
@@ -247,8 +272,9 @@ function startTick(){
   timer=setInterval(function(){
     if(S.paused) return;
     var next=S.tl-1;
-    if(next>0 && next<=10) bip(next<=3?1100:880, 0.08, next<=3?0.4:0.28);
-    if(next<=0){ S.tl=0; clearInterval(timer); advance(); }
+    if(next>=5 && next<=10){ bip(880,0.10,0.28); }
+    else if(next>=1 && next<=4){ bip(UP_NOTES[next],0.16,0.32); }
+    if(next<=0){ S.tl=0; zeroSound(); clearInterval(timer); advance(); }
     else { S.tl=next; renderSession(); }
   },1000);
 }
@@ -257,7 +283,7 @@ function advance(){
   if(S.phase==="work"){
     if(S.setIdx<l.s-1){ go("restSet", S.exIdx, S.setIdx, l.r); }
     else if(S.exIdx<EX.length-1){ go("restEx", S.exIdx, S.setIdx, REST_EX); }
-    else { chime(); vibe([300,100,300,100,500]); S.done=true; renderSession(); }
+    else { setTimeout(function(){ vibe([300,100,300,100,500]); }, 900); S.done=true; renderSession(); }
   } else if(S.phase==="restSet"){
     go("work", S.exIdx, S.setIdx+1, LVL[S.exIdx][S.week-1].w);
   } else if(S.phase==="restEx"){
@@ -266,25 +292,33 @@ function advance(){
 }
 function go(phase, exIdx, setIdx, tl){
   S.phase=phase; S.exIdx=exIdx; S.setIdx=setIdx; S.tl=tl; S.paused=false;
-  if(phase==="work"){ bip(880,0.18,0.42); vibe(80); }
-  else if(phase==="restSet"){ bip(440,0.22,0.36); }
-  else { bip(330,0.38,0.36); }
+  startSound(); vibe(80);
   renderSession();
   startTick();
 }
 function togglePause(){ S.paused=!S.paused; renderSession(); }
-function quitSession(){ clearInterval(timer); goHome(); }
+function quitSession(){ clearInterval(timer); S.running=false; goHome(); }
 
 // ── Navigation ───────────────────────────────────────────────────────────────────
 function setWeek(w){ S.week=w; renderHome(); }
 function showGuide(){ clearInterval(timer); S.screen="guide"; renderGuide(); }
-function startSession(){
+// prepare : ecran pret, le timer ne demarre PAS encore
+function prepareSession(){
   getCtx();
-  S.screen="session"; S.exIdx=0; S.setIdx=0; S.phase="work"; S.tl=LVL[0][S.week-1].w; S.paused=false; S.done=false;
+  clearInterval(timer);
+  S.screen="ready"; S.exIdx=0; S.setIdx=0; S.phase="work"; S.tl=LVL[0][S.week-1].w; S.paused=false; S.done=false; S.running=false;
+  renderReady();
+}
+// begin : c'est ici que TOI tu lances le timer
+function beginSession(){
+  getCtx();
+  S.screen="session"; S.running=true;
+  S.phase="work"; S.tl=LVL[0][S.week-1].w; S.paused=false;
+  startSound(); vibe(80);
   renderSession();
   startTick();
 }
-function goHome(){ clearInterval(timer); S.screen="home"; S.done=false; renderHome(); }
+function goHome(){ clearInterval(timer); S.screen="home"; S.done=false; S.running=false; renderHome(); }
 
 renderHome();
 </script>
