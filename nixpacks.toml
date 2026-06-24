@@ -5,4 +5,4 @@ nixPkgs = ["nodejs"]
 cmds = ["npm install -g serve"]
 
 [start]
-cmd = "serve . -p $PORT"
+cmd = "npx serve . -p $PORT"
