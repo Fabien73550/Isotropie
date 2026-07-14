@@ -21,7 +21,7 @@
 <div id="app"></div>
 <script>
 // ── Donnees exercices (ordre de seance) ────────────────────────────────────────
-var EX = [
+var EX_ALL = [
   { name:"La Chaise", zh:"\u9760\u5899\u9759\u8E72", py:"kao qiang jing dun", em:"\uD83E\uDE91",
     desc:"Dos plaqué contre un mur, descends jusqu'à ce que tes cuisses soient parallèles au sol, genoux à 90 degrés au-dessus des chevilles. Les bras restent libres, ne pose pas les mains sur les cuisses.",
     eff:"Travail intense des quadriceps, fessiers et mollets. Reconnu pour faire baisser la tension artérielle et renforcer l'endurance des jambes." },
@@ -36,18 +36,79 @@ var EX = [
     eff:"Renforce toute la chaîne arrière : fessiers, ischio-jambiers, bas du dos, plus les épaules et triceps. Ouvre la poitrine et corrige la posture." },
   { name:"Suspension Passive", zh:"\u60AC\u5782", py:"xuan chui", em:"\uD83C\uDFCB",
     desc:"Suspends-toi à une barre, bras tendus, mains écartées largeur d'épaules. Laisse le corps pendre sans remonter les épaules vers les oreilles, garde-les actives et basses.",
-    eff:"Renforce la prise (grip) et les avant-bras, décompresse la colonne vertébrale (baisse la pression sur les disques), améliore la mobilité des épaules et soulage le dos." }
+    eff:"Renforce la prise (grip) et les avant-bras, décompresse la colonne vertébrale (baisse la pression sur les disques), améliore la mobilité des épaules et soulage le dos." },
+  { name:"Planche", zh:"\u5E73\u677F\u652F\u6491", py:"ping ban zhi cheng", em:"\uD83D\uDEE1",
+    desc:"En appui sur les avant-bras et la pointe des pieds, corps parfaitement aligné des épaules aux talons. Serre les abdos et les fessiers, ne laisse pas le bassin s'affaisser ni remonter.",
+    eff:"Renforce toute la sangle abdominale profonde, les épaules et le bas du dos. Améliore la posture et la stabilité du tronc." },
+  { name:"Pompe Tenue Basse", zh:"\u4F4E\u4F4D\u4FEF\u5367\u6491", py:"di wei fu wo cheng", em:"\uD83D\uDCAA",
+    desc:"Descends en position basse de pompe, coudes pliés, poitrine proche du sol, et tiens la position sans bouger. Corps gainé et aligné, coudes le long du corps.",
+    eff:"Travail intense des pectoraux, triceps et épaules avant. Développe la force de poussée et la stabilité du haut du corps." },
+  { name:"Gainage Latéral", zh:"\u4FA7\u5E73\u677F\u652F\u6491", py:"ce ping ban zhi cheng", em:"\uD83E\uDD38",
+    desc:"Sur le côté, en appui sur un avant-bras et le tranchant du pied, hanches décollées pour former une ligne droite. Alterne le côté à chaque série : série 1 à droite, série 2 à gauche, série 3 à droite, etc.",
+    eff:"Renforce les obliques, la stabilité latérale du tronc et l'épaule d'appui. Complète la planche frontale pour un gainage équilibré." },
+  { name:"Pont Fessier", zh:"\u81C0\u6865", py:"tun qiao", em:"\uD83C\uDF09",
+    desc:"Allongé sur le dos, genoux pliés, pieds à plat au sol largeur de hanches. Décolle le bassin jusqu'à former une ligne droite des épaules aux genoux, et tiens en serrant fort les fessiers.",
+    eff:"Renforce les fessiers, les ischio-jambiers et le bas du dos. Isole la chaîne postérieure que les squats ne travaillent qu'indirectement, améliore la posture et protège le dos." },
+  { name:"Extension Dorsale", zh:"\u5C0F\u71D5\u98DE", py:"xiao yan fei", em:"\uD83E\uDDB8",
+    desc:"Allongé sur le ventre, bras tendus vers l'avant. Décolle en même temps la poitrine, les bras et les jambes du sol, comme Superman en vol, et tiens la position en serrant le dos et les fessiers.",
+    eff:"Renforce toute la chaîne postérieure du haut du corps : muscles du dos, épaules arrière et fessiers. Corrige la posture voûtée et équilibre le travail de poussée des pompes." }
 ];
 var REST_EX = 120;
 
 // ── Niveaux (semaine 1/2/3) ──────────────────────────────────────────────────────
-var LVL = [
+var LVL_ALL = [
   [{s:3,w:30,r:60},{s:4,w:50,r:60},{s:5,w:90,r:90}],
-  [{s:3,w:30,r:60},{s:3,w:90,r:75},{s:3,w:180,r:90}],
+  [{s:3,w:30,r:30},{s:3,w:90,r:45},{s:3,w:180,r:60}],
   [{s:3,w:25,r:30},{s:4,w:45,r:30},{s:5,w:60,r:45}],
   [{s:3,w:15,r:45},{s:3,w:30,r:45},{s:3,w:50,r:30}],
-  [{s:3,w:15,r:60},{s:4,w:35,r:60},{s:5,w:60,r:60}]
+  [{s:3,w:15,r:60},{s:4,w:35,r:60},{s:5,w:60,r:60}],
+  [{s:3,w:30,r:45},{s:3,w:45,r:45},{s:4,w:60,r:45}],
+  [{s:3,w:15,r:60},{s:3,w:25,r:60},{s:4,w:35,r:60}],
+  [{s:4,w:20,r:30},{s:4,w:30,r:30},{s:4,w:40,r:30}],
+  [{s:3,w:30,r:45},{s:3,w:45,r:45},{s:4,w:60,r:45}],
+  [{s:3,w:20,r:45},{s:3,w:30,r:45},{s:4,w:40,r:45}]
 ];
+
+// ── Composition + ORDRE de chaque programme (indices dans EX_ALL) ────────────────────
+// EX_ALL : 0 Chaise, 1 Mollets, 2 Cavalier, 3 Table Inversee, 4 Suspension,
+//          5 Planche, 6 Pompe, 7 Gainage Lateral, 8 Pont Fessier, 9 Extension Dorsale
+var PROG = {
+  bas:  [8, 0, 1, 2, 3],   // Pont Fessier, Chaise, Mollets, Cavalier, Table Inversee
+  haut: [5, 9, 6, 7, 4]    // Planche, Extension Dorsale, Pompe, Gainage Lateral, Suspension
+};
+
+// ── Vues ordonnees selon le programme actif (remplies par applyProgram) ─────────────
+var EX = [], LVL = [];
+function applyProgram(){
+  EX = []; LVL = [];
+  var order = PROG[S.prog];
+  for(var i=0;i<order.length;i++){ var idx=order[i]; EX.push(EX_ALL[idx]); LVL.push(LVL_ALL[idx]); }
+}
+
+// ── Contenu enrichi du guide (meme ordre que EX_ALL) : points cles + respiration ────
+var GUIDE = [
+  { cues:"Genoux a 90 degres, alignes au-dessus des chevilles (jamais au-dela des orteils). Dos entierement plaque au mur, bas du dos compris. Bras libres, ne pose pas les mains sur les cuisses.",
+    resp:"Respire lentement et regulierement, ne bloque jamais ta respiration." },
+  { cues:"Monte le plus haut possible sur la pointe des pieds, poids sur le gros orteil. Jambes tendues, buste droit. Pour l'equilibre, effleure un mur du bout des doigts si besoin.",
+    resp:"Respiration continue, expire en tenant la contraction du mollet." },
+  { cues:"Pieds plus larges que les epaules, pointes vers l'avant. Pousse activement les genoux vers l'exterieur (ils ne rentrent pas). Dos droit, poids reparti sur les talons.",
+    resp:"Respire par le ventre, calmement, sans a-coups." },
+  { cues:"Bassin haut, corps en ligne droite des epaules aux chevilles. Serre fessiers et abdos. Epaules basses, loin des oreilles. Regard vers le plafond.",
+    resp:"Souffle regulierement, ne coupe pas la respiration pendant la tenue." },
+  { cues:"Bras tendus, prise largeur d'epaules. Garde les epaules actives et basses (pas totalement relachees). Laisse pendre le bas du corps sans te balancer.",
+    resp:"Respiration profonde et lente, relache les tensions a chaque expiration." },
+  { cues:"Coudes sous les epaules, avant-bras au sol. Corps en ligne droite : ne creuse pas le bas du dos, ne remonte pas les fesses. Serre abdos et fessiers, menton legerement rentre.",
+    resp:"Respire normalement : le gainage tient par la contraction, pas par l'apnee." },
+  { cues:"Descends jusqu'a ce que la poitrine soit proche du sol, coudes a environ 45 degres du corps (pas ecartes a l'equerre). Corps gaine et aligne. Trop dur ? Pose les genoux au sol.",
+    resp:"Souffle de facon controlee, garde le tronc serre en permanence." },
+  { cues:"Coude sous l'epaule, corps en ligne droite de la tete aux pieds. Hanches bien decollees, ne laisse pas le bassin descendre. Alterne le cote a chaque serie.",
+    resp:"Respiration reguliere, gaine les obliques du cote au sol." },
+  { cues:"Pieds a plat, talons proches des fessiers, largeur de hanches. Pousse dans les talons (pas la pointe). Serre fort les fessiers en haut sans cambrer le bas du dos. Epaules et nuque relachees au sol.",
+    resp:"Respiration reguliere, expire en montant le bassin et garde les fessiers contractes." },
+  { cues:"Regarde le sol, nuque dans l'alignement (ne casse pas la tete en arriere). Decolle poitrine, bras et cuisses en meme temps. Serre les omoplates et les fessiers. Mouvement doux, sans a-coups.",
+    resp:"Respire calmement pendant la tenue, ne bloque jamais la respiration." }
+];
+for(var gi=0; gi<EX_ALL.length; gi++){ EX_ALL[gi].cues=GUIDE[gi].cues; EX_ALL[gi].resp=GUIDE[gi].resp; }
 
 // ── Palette (fond beige chaud + tons C harmonises) ───────────────────────────────
 var CLR = {
@@ -83,7 +144,7 @@ var UP_NOTES = { 4:392, 3:523, 2:659, 1:784 };
 function vibe(p){ try{ if(navigator.vibrate)navigator.vibrate(p); }catch(e){} }
 
 // ── Etat global ─────────────────────────────────────────────────────────────────
-var S = { screen:"home", week:1, exIdx:0, setIdx:0, phase:"work", tl:0, paused:false, done:false, running:false };
+var S = { screen:"home", week:1, prog:"bas", exIdx:0, setIdx:0, phase:"work", tl:0, paused:false, done:false, running:false };
 var SOUND = 1;
 function toggleSound(){ SOUND=!SOUND; renderSession(); }
 function playBip(f,d,v){ if(SOUND) bip(f,d,v); }
@@ -139,10 +200,17 @@ function renderHome(){
     + '<p style="font-size:12px;color:'+DM+';margin:0;text-align:center;">'+labels[S.week-1]+' - environ <strong style="color:'+TX+';">'+totalMin()+' min</strong></p>'
     + '</div>'
     + '<div style="background:'+SF+';border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(58,51,42,0.06);">'
+    + '<p style="font-size:11px;color:'+DM+';margin:0 0 10px;text-transform:uppercase;letter-spacing:0.1em;">Programme du jour</p>'
+    + '<div style="display:flex;gap:8px;">'
+    + '<button onclick="setProgram(\'bas\')" style="flex:1;padding:13px 0;border-radius:12px;border:none;background:'+(S.prog==="bas"?CLR.work.m:SOFT)+';color:'+(S.prog==="bas"?"#fff":DM)+';font-size:13px;font-weight:'+(S.prog==="bas"?600:500)+';">Bas du corps</button>'
+    + '<button onclick="setProgram(\'haut\')" style="flex:1;padding:13px 0;border-radius:12px;border:none;background:'+(S.prog==="haut"?CLR.work.m:SOFT)+';color:'+(S.prog==="haut"?"#fff":DM)+';font-size:13px;font-weight:'+(S.prog==="haut"?600:500)+';">Haut du corps</button>'
+    + '</div>'
+    + '</div>'
+    + '<div style="background:'+SF+';border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(58,51,42,0.06);">'
     + '<p style="font-size:11px;color:'+DM+';margin:0 0 10px;text-transform:uppercase;letter-spacing:0.1em;">Séance du jour</p>';
   for(var i=0;i<EX.length;i++){
     var l=LVL[i][S.week-1];
-    h+='<div style="display:flex;align-items:center;gap:12px;padding:11px 0;'+(i<4?"border-bottom:1px solid "+SOFT+";":"")+'">'
+    h+='<div style="display:flex;align-items:center;gap:12px;padding:11px 0;'+(i<EX.length-1?"border-bottom:1px solid "+SOFT+";":"")+'">'
       + '<span style="font-size:30px;width:38px;text-align:center;">'+EX[i].em+'</span>'
       + '<div style="flex:1;min-width:0;">'
       + '<p style="margin:0 0 2px;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:'+TX+';">'+EX[i].name+'</p>'
@@ -170,10 +238,21 @@ function renderGuide(){
     + '<div style="max-width:400px;margin:0 auto;">'
     + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">'
     + '<button onclick="goHome()" style="background:'+SF+';border:none;color:'+TX+';font-size:18px;width:40px;height:40px;border-radius:12px;box-shadow:0 2px 8px rgba(58,51,42,0.08);">\u2190</button>'
-    + '<h1 style="font-size:21px;font-weight:700;margin:0;color:'+TX+';">Guide des postures</h1>'
+    + '<h1 style="font-size:21px;font-weight:700;margin:0;color:'+TX+';">Guide - '+(S.prog==="bas"?"Bas du corps":"Haut du corps")+'</h1>'
     + '</div>';
   for(var i=0;i<EX.length;i++){
     var e=EX[i];
+    var wk=LVL[i];
+    var cons='<div style="display:flex;gap:6px;">';
+    for(var w=0;w<3;w++){
+      var on=(S.week===w+1);
+      cons+='<div style="flex:1;text-align:center;padding:9px 4px;border-radius:11px;background:'+(on?CLR.work.m:SOFT)+';">'
+        + '<div style="font-size:9px;color:'+(on?"rgba(255,255,255,0.85)":DM)+';text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Sem. '+(w+1)+'</div>'
+        + '<div style="font-size:13px;font-weight:700;margin-top:3px;color:'+(on?"#fff":TX)+';">'+wk[w].s+'\u00D7'+wk[w].w+'s</div>'
+        + '<div style="font-size:10px;margin-top:1px;color:'+(on?"rgba(255,255,255,0.85)":DM)+';">repos '+wk[w].r+'s</div>'
+        + '</div>';
+    }
+    cons+='</div>';
     h+='<div style="background:'+SF+';border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 6px 24px rgba(58,51,42,0.10);">'
       + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">'
       + '<span style="font-size:34px;">'+e.em+'</span>'
@@ -186,9 +265,21 @@ function renderGuide(){
       + '<p style="margin:0 0 3px;font-size:10px;color:'+DM+';text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">Comment faire</p>'
       + '<p style="margin:0;font-size:13px;color:'+TX+';line-height:1.55;">'+e.desc+'</p>'
       + '</div>'
-      + '<div>'
+      + '<div style="margin-bottom:10px;">'
+      + '<p style="margin:0 0 3px;font-size:10px;color:'+CLR.restEx.m+';text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">Points clés</p>'
+      + '<p style="margin:0;font-size:13px;color:'+TX+';line-height:1.55;">'+e.cues+'</p>'
+      + '</div>'
+      + '<div style="margin-bottom:10px;">'
+      + '<p style="margin:0 0 3px;font-size:10px;color:'+DM+';text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">Respiration</p>'
+      + '<p style="margin:0;font-size:13px;color:'+TX+';line-height:1.55;">'+e.resp+'</p>'
+      + '</div>'
+      + '<div style="margin-bottom:12px;">'
       + '<p style="margin:0 0 3px;font-size:10px;color:'+CLR.restSet.m+';text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">Ce que ça fait</p>'
       + '<p style="margin:0;font-size:13px;color:'+TX+';line-height:1.55;">'+e.eff+'</p>'
+      + '</div>'
+      + '<div style="padding-top:12px;border-top:1px solid '+SOFT+';">'
+      + '<p style="margin:0 0 7px;font-size:10px;color:'+CLR.work.m+';text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">Ta consigne</p>'
+      + cons
       + '</div>'
       + '</div>';
   }
@@ -326,6 +417,7 @@ function quitSession(){ clearInterval(timer); S.running=false; goHome(); }
 
 // ── Navigation ───────────────────────────────────────────────────────────────────
 function setWeek(w){ S.week=w; renderHome(); }
+function setProgram(p){ S.prog=p; applyProgram(); renderHome(); }
 function showGuide(){ clearInterval(timer); S.screen="guide"; renderGuide(); }
 // prepare : ecran pret, le timer ne demarre PAS encore
 function prepareSession(){
@@ -346,6 +438,7 @@ function beginSession(){
 }
 function goHome(){ clearInterval(timer); S.screen="home"; S.done=false; S.running=false; renderHome(); }
 
+applyProgram();
 renderHome();
 </script>
 </body>
