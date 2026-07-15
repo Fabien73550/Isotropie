@@ -47,12 +47,13 @@ var EX_ALL = [
     desc:"Sur le côté, en appui sur un avant-bras et le tranchant du pied, hanches décollées pour former une ligne droite. Alterne le côté à chaque série : série 1 à droite, série 2 à gauche, série 3 à droite, etc.",
     eff:"Renforce les obliques, la stabilité latérale du tronc et l'épaule d'appui. Complète la planche frontale pour un gainage équilibré." },
   { name:"Pont Fessier", zh:"\u81C0\u6865", py:"tun qiao", em:"\uD83C\uDF09",
-    desc:"Allongé sur le dos, genoux pliés, pieds à plat au sol largeur de hanches. Décolle le bassin jusqu'à former une ligne droite des épaules aux genoux, et tiens en serrant fort les fessiers.",
+    desc:"Allongé sur le dos, genoux pliés, pieds à plat au sol largeur de hanches. Épaules au sol, décolle uniquement le bassin jusqu'à aligner épaules, hanches et genoux (les genoux restent pliés). Tiens en serrant fort les fessiers.",
     eff:"Renforce les fessiers, les ischio-jambiers et le bas du dos. Isole la chaîne postérieure que les squats ne travaillent qu'indirectement, améliore la posture et protège le dos." },
   { name:"Extension Dorsale", zh:"\u5C0F\u71D5\u98DE", py:"xiao yan fei", em:"\uD83E\uDDB8",
     desc:"Allongé sur le ventre, bras tendus vers l'avant. Décolle en même temps la poitrine, les bras et les jambes du sol, comme Superman en vol, et tiens la position en serrant le dos et les fessiers.",
     eff:"Renforce toute la chaîne postérieure du haut du corps : muscles du dos, épaules arrière et fessiers. Corrige la posture voûtée et équilibre le travail de poussée des pompes." }
 ];
+var REST_EX_PROG = { bas:120, haut:60 };
 var REST_EX = 120;
 
 // ── Niveaux (semaine 1/2/3) ──────────────────────────────────────────────────────
@@ -61,12 +62,12 @@ var LVL_ALL = [
   [{s:3,w:30,r:30},{s:3,w:90,r:45},{s:3,w:180,r:60}],
   [{s:3,w:25,r:30},{s:4,w:45,r:30},{s:5,w:60,r:45}],
   [{s:3,w:15,r:45},{s:3,w:30,r:45},{s:3,w:50,r:30}],
-  [{s:3,w:15,r:60},{s:4,w:35,r:60},{s:5,w:60,r:60}],
+  [{s:3,w:15,r:45},{s:4,w:35,r:45},{s:5,w:60,r:45}],
+  [{s:3,w:30,r:30},{s:3,w:45,r:30},{s:4,w:60,r:30}],
+  [{s:3,w:15,r:45},{s:3,w:25,r:45},{s:4,w:35,r:45}],
+  [{s:4,w:20,r:15},{s:4,w:30,r:15},{s:4,w:40,r:15}],
   [{s:3,w:30,r:45},{s:3,w:45,r:45},{s:4,w:60,r:45}],
-  [{s:3,w:15,r:60},{s:3,w:25,r:60},{s:4,w:35,r:60}],
-  [{s:4,w:20,r:30},{s:4,w:30,r:30},{s:4,w:40,r:30}],
-  [{s:3,w:30,r:45},{s:3,w:45,r:45},{s:4,w:60,r:45}],
-  [{s:3,w:20,r:45},{s:3,w:30,r:45},{s:4,w:40,r:45}]
+  [{s:3,w:20,r:30},{s:3,w:30,r:30},{s:4,w:40,r:30}]
 ];
 
 // ── Composition + ORDRE de chaque programme (indices dans EX_ALL) ────────────────────
@@ -81,6 +82,7 @@ var PROG = {
 var EX = [], LVL = [];
 function applyProgram(){
   EX = []; LVL = [];
+  REST_EX = REST_EX_PROG[S.prog];
   var order = PROG[S.prog];
   for(var i=0;i<order.length;i++){ var idx=order[i]; EX.push(EX_ALL[idx]); LVL.push(LVL_ALL[idx]); }
 }
