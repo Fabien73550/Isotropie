@@ -51,32 +51,58 @@ var EX_ALL = [
     eff:"Renforce les fessiers, les ischio-jambiers et le bas du dos. Isole la chaîne postérieure que les squats ne travaillent qu'indirectement, améliore la posture et protège le dos." },
   { name:"Extension Dorsale", zh:"\u5C0F\u71D5\u98DE", py:"xiao yan fei", em:"\uD83E\uDDB8",
     desc:"Allongé sur le ventre, bras tendus vers l'avant. Décolle en même temps la poitrine, les bras et les jambes du sol, comme Superman en vol, et tiens la position en serrant le dos et les fessiers.",
-    eff:"Renforce toute la chaîne postérieure du haut du corps : muscles du dos, épaules arrière et fessiers. Corrige la posture voûtée et équilibre le travail de poussée des pompes." }
+    eff:"Renforce toute la chaîne postérieure du haut du corps : muscles du dos, épaules arrière et fessiers. Corrige la posture voûtée et équilibre le travail de poussée des pompes." },
+  { name:"Squat Profond", zh:"\u6DF1\u8E72", py:"shen dun", em:"\uD83D\uDC38",
+    desc:"Pieds largeur d'épaules, descends accroupi le plus bas possible, talons au sol, poitrine haute. Coudes à l'intérieur des genoux pour les écarter doucement, mains jointes devant toi.",
+    eff:"Étire chevilles, hanches, adducteurs et bas du dos en une seule posture. Restaure la mobilité d'accroupissement naturelle et complète directement la Chaise et le Cavalier." },
+  { name:"Chien Tête en Bas", zh:"\u4E0B\u72AC\u5F0F", py:"xia quan shi", em:"\uD83D\uDC15",
+    desc:"À quatre pattes, pousse les hanches vers le haut et l'arrière pour former un V inversé. Jambes tendues ou légèrement pliées, talons tirés vers le sol, dos long, tête relâchée entre les bras.",
+    eff:"Étire toute la chaîne postérieure : ischio-jambiers, mollets, épaules et grand dorsal. Décompresse la colonne vertébrale et compense les longues tenues de gainage." },
+  { name:"Fente du Psoas", zh:"\u4F4E\u5F13\u6B65", py:"di gong bu", em:"\uD83E\uDDCE",
+    desc:"Un genou au sol, l'autre pied loin devant à 90 degrés. Bascule le bassin vers l'avant jusqu'à sentir l'étirement dans la hanche arrière, buste droit, bras levé du côté du genou au sol. Série 1 à droite, série 2 à gauche.",
+    eff:"Étire le psoas et le quadriceps, les muscles qui raidissent le plus avec la Chaise, le Cavalier et la position assise. Libère le bassin et soulage les lombaires." },
+  { name:"Pigeon", zh:"\u9E3D\u5B50\u5F0F", py:"ge zi shi", em:"\uD83D\uDD4A",
+    desc:"Depuis quatre pattes, amène le genou droit vers la main droite, tibia posé au sol devant toi, jambe gauche tendue derrière. Bassin bien droit face au sol, descends le buste vers l'avant selon ta souplesse. Série 1 à droite, série 2 à gauche.",
+    eff:"Étire en profondeur les fessiers et le piriforme, très sollicités par le Pont Fessier et la Chaise. Prévient les tensions de type sciatique et libère la rotation de hanche." },
+  { name:"Ouverture Thoracique", zh:"\u5F00\u80F8\u5F0F", py:"kai xiong shi", em:"\uD83D\uDEAA",
+    desc:"Debout dans un cadre de porte, avant-bras posés sur chaque montant, coudes à hauteur d'épaules. Avance doucement un pied et pousse la poitrine vers l'avant jusqu'à sentir l'étirement dans les pectoraux.",
+    eff:"Étire les pectoraux et l'avant des épaules, raidis par la Pompe Tenue Basse et la Planche. Corrige la posture voûtée et redonne de l'amplitude aux épaules." },
+  { name:"Torsion Vertébrale", zh:"\u810A\u67F1\u626D\u8F6C", py:"ji zhu niu zhuan", em:"\uD83C\uDF00",
+    desc:"Allongé sur le dos, bras en croix, genoux pliés. Laisse tomber les deux genoux d'un côté vers le sol, tête tournée du côté opposé, les deux épaules restent collées au sol. Série 1 à droite, série 2 à gauche.",
+    eff:"Mobilise toute la colonne vertébrale, étire les obliques et détend les lombaires. Idéale en fin de séance pour relâcher le dos après le gainage." }
 ];
-var REST_EX_PROG = { bas:120, haut:60 };
+var REST_EX_PROG = { bas:60, haut:50, sou:15 };
 var REST_EX = 120;
 
 // ── Niveaux (semaine 1/2/3) ──────────────────────────────────────────────────────
 var LVL_ALL = [
-  [{s:3,w:30,r:60},{s:4,w:50,r:60},{s:5,w:90,r:90}],
-  [{s:3,w:30,r:30},{s:3,w:90,r:45},{s:3,w:180,r:60}],
+  [{s:3,w:30,r:40},{s:4,w:50,r:40},{s:5,w:90,r:60}],
+  [{s:3,w:30,r:20},{s:3,w:90,r:30},{s:3,w:180,r:40}],
   [{s:3,w:25,r:30},{s:4,w:45,r:30},{s:5,w:60,r:45}],
-  [{s:3,w:15,r:45},{s:3,w:30,r:45},{s:3,w:50,r:30}],
-  [{s:3,w:15,r:45},{s:4,w:35,r:45},{s:5,w:60,r:45}],
-  [{s:3,w:30,r:30},{s:3,w:45,r:30},{s:4,w:60,r:30}],
-  [{s:3,w:15,r:45},{s:3,w:25,r:45},{s:4,w:35,r:45}],
+  [{s:3,w:15,r:30},{s:3,w:30,r:30},{s:3,w:50,r:30}],
+  [{s:3,w:15,r:30},{s:4,w:35,r:30},{s:5,w:60,r:30}],
+  [{s:3,w:30,r:20},{s:3,w:45,r:20},{s:4,w:60,r:20}],
+  [{s:3,w:15,r:30},{s:3,w:25,r:30},{s:4,w:35,r:30}],
   [{s:4,w:20,r:15},{s:4,w:30,r:15},{s:4,w:40,r:15}],
-  [{s:3,w:30,r:45},{s:3,w:45,r:45},{s:4,w:60,r:45}],
-  [{s:3,w:20,r:30},{s:3,w:30,r:30},{s:4,w:40,r:30}]
+  [{s:3,w:30,r:30},{s:3,w:45,r:30},{s:4,w:60,r:30}],
+  [{s:3,w:20,r:20},{s:3,w:30,r:20},{s:4,w:40,r:20}],
+  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}],
+  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}],
+  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}],
+  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}],
+  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}],
+  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}]
 ];
 
 // ── Composition + ORDRE de chaque programme (indices dans EX_ALL) ────────────────────
 // EX_ALL : 0 Chaise, 1 Mollets, 2 Cavalier, 3 Table Inversee, 4 Suspension,
 //          5 Planche, 6 Pompe, 7 Gainage Lateral, 8 Pont Fessier, 9 Extension Dorsale
 var PROG = {
-  bas:  [8, 0, 1, 2, 3],   // Pont Fessier, Chaise, Mollets, Cavalier, Table Inversee
-  haut: [5, 9, 6, 7, 4]    // Planche, Extension Dorsale, Pompe, Gainage Lateral, Suspension
+  bas:  [8, 3, 0, 1, 2],        // Pont Fessier, Table Inversee, Chaise, Mollets, Cavalier
+  haut: [5, 9, 6, 7, 4],        // Planche, Extension Dorsale, Pompe, Gainage Lateral, Suspension
+  sou:  [10, 11, 12, 13, 14, 15] // Squat Profond, Chien Tete en Bas, Fente Psoas, Pigeon, Ouverture Thoracique, Torsion
 };
+var PROG_NAMES = { bas:"Bas du corps", haut:"Haut du corps", sou:"Souplesse" };
 
 // ── Vues ordonnees selon le programme actif (remplies par applyProgram) ─────────────
 var EX = [], LVL = [];
@@ -108,7 +134,19 @@ var GUIDE = [
   { cues:"Pieds a plat, talons proches des fessiers, largeur de hanches. Pousse dans les talons (pas la pointe). Serre fort les fessiers en haut sans cambrer le bas du dos. Epaules et nuque relachees au sol.",
     resp:"Respiration reguliere, expire en montant le bassin et garde les fessiers contractes." },
   { cues:"Regarde le sol, nuque dans l'alignement (ne casse pas la tete en arriere). Decolle poitrine, bras et cuisses en meme temps. Serre les omoplates et les fessiers. Mouvement doux, sans a-coups.",
-    resp:"Respire calmement pendant la tenue, ne bloque jamais la respiration." }
+    resp:"Respire calmement pendant la tenue, ne bloque jamais la respiration." },
+  { cues:"Talons au sol obligatoirement (surélève-les sur un livre au début si besoin). Dos le plus droit possible, poitrine ouverte. Le poids reste au milieu des pieds, pas sur les orteils.",
+    resp:"Respire profondément par le ventre, laisse les hanches descendre un peu plus à chaque expiration." },
+  { cues:"Priorité au dos long, pas aux jambes tendues : plie les genoux si le dos s'arrondit. Pousse fort le sol avec les mains, les talons cherchent le sol sans forcément le toucher.",
+    resp:"Respiration lente et régulière, expire en poussant les talons vers le sol." },
+  { cues:"Le mouvement vient du bassin qui bascule vers l'avant, pas du buste qui se penche. Serre le fessier de la jambe arrière pour intensifier. Genou avant au-dessus de la cheville.",
+    resp:"Expire en avançant le bassin, garde une respiration fluide pendant toute la tenue." },
+  { cues:"Le bassin reste droit et face au sol, ne bascule pas sur le côté du genou plié. Si c'est trop intense, garde le buste relevé sur les mains. Aucune douleur au genou tolérée.",
+    resp:"Respire lentement, relâche un peu plus le buste vers le sol à chaque expiration." },
+  { cues:"Coudes à hauteur des épaules. Avance avec le corps entier, ne cambre pas le bas du dos. Épaules basses, loin des oreilles.",
+    resp:"Expire en avançant la poitrine, tiens la position en respirant amplement." },
+  { cues:"Les deux épaules restent collées au sol, c'est plus important que de poser les genoux. Laisse la gravité faire le travail, ne force jamais la torsion.",
+    resp:"Respiration très lente, laisse les genoux descendre un peu plus à chaque expiration." }
 ];
 for(var gi=0; gi<EX_ALL.length; gi++){ EX_ALL[gi].cues=GUIDE[gi].cues; EX_ALL[gi].resp=GUIDE[gi].resp; }
 
@@ -153,6 +191,35 @@ function playBip(f,d,v){ if(SOUND) bip(f,d,v); }
 function playZero(){ if(SOUND) zeroSound(); }
 function playStart(){ if(SOUND) startSound(); }
 var timer=null;
+// ── Historique des seances + suggestion (cycle Haut > Souplesse > Bas > Souplesse) ──
+function loadHist(){ try{ return JSON.parse(localStorage.getItem("iso_hist")||"[]"); }catch(e){ return []; } }
+function saveSession(){
+  try{
+    var h=loadHist();
+    h.push({ p:S.prog, d:new Date().toISOString().slice(0,10) });
+    if(h.length>10) h=h.slice(h.length-10);
+    localStorage.setItem("iso_hist", JSON.stringify(h));
+  }catch(e){}
+}
+function suggestNext(){
+  var h=loadHist();
+  if(!h.length) return null;
+  var last=h[h.length-1];
+  if(last.p==="haut"||last.p==="bas") return { prog:"sou", last:last };
+  for(var i=h.length-1;i>=0;i--){
+    if(h[i].p==="haut") return { prog:"bas", last:last };
+    if(h[i].p==="bas") return { prog:"haut", last:last };
+  }
+  return { prog:"bas", last:last };
+}
+function daysAgoTxt(dstr){
+  var today=new Date(); today.setHours(0,0,0,0);
+  var d=new Date(dstr+"T00:00:00");
+  var diff=Math.round((today-d)/86400000);
+  if(diff<=0) return "aujourd'hui";
+  if(diff===1) return "hier";
+  return "il y a "+diff+" jours";
+}
 var app = document.getElementById("app");
 
 // ── Horloge a aiguille (SVG) ─────────────────────────────────────────────────────
@@ -202,11 +269,23 @@ function renderHome(){
     + '<p style="font-size:12px;color:'+DM+';margin:0;text-align:center;">'+labels[S.week-1]+' - environ <strong style="color:'+TX+';">'+totalMin()+' min</strong></p>'
     + '</div>'
     + '<div style="background:'+SF+';border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(58,51,42,0.06);">'
-    + '<p style="font-size:11px;color:'+DM+';margin:0 0 10px;text-transform:uppercase;letter-spacing:0.1em;">Programme du jour</p>'
-    + '<div style="display:flex;gap:8px;">'
-    + '<button onclick="setProgram(\'bas\')" style="flex:1;padding:13px 0;border-radius:12px;border:none;background:'+(S.prog==="bas"?CLR.work.m:SOFT)+';color:'+(S.prog==="bas"?"#fff":DM)+';font-size:13px;font-weight:'+(S.prog==="bas"?600:500)+';">Bas du corps</button>'
-    + '<button onclick="setProgram(\'haut\')" style="flex:1;padding:13px 0;border-radius:12px;border:none;background:'+(S.prog==="haut"?CLR.work.m:SOFT)+';color:'+(S.prog==="haut"?"#fff":DM)+';font-size:13px;font-weight:'+(S.prog==="haut"?600:500)+';">Haut du corps</button>'
-    + '</div>'
+    + '<p style="font-size:11px;color:'+DM+';margin:0 0 10px;text-transform:uppercase;letter-spacing:0.1em;">Programme du jour</p>';
+  var sug=suggestNext();
+  if(sug){
+    var okS=(S.prog===sug.prog);
+    h+='<div style="background:'+(okS?CLR.restSet.g:SOFT)+';border-radius:12px;padding:11px 13px;margin-bottom:10px;'+(okS?"border:1.5px solid "+CLR.restSet.m+";":"")+'">'
+      + '<p style="margin:0;font-size:12px;color:'+TX+';line-height:1.5;">\uD83D\uDCA1 <strong>Suggestion : '+PROG_NAMES[sug.prog]+'</strong><br>'
+      + '<span style="color:'+DM+';">Dernière séance : '+PROG_NAMES[sug.last.p]+' ('+daysAgoTxt(sug.last.d)+')</span></p>'
+      + (okS?'':'<button onclick="setProgram(\''+sug.prog+'\')" style="margin-top:8px;padding:8px 14px;border-radius:10px;border:none;background:'+CLR.restSet.m+';color:#fff;font-size:12px;font-weight:700;">Choisir '+PROG_NAMES[sug.prog]+'</button>')
+      + '</div>';
+  }
+  h+='<div style="display:flex;gap:8px;">';
+  var progs=["bas","haut","sou"];
+  for(var pb=0;pb<progs.length;pb++){
+    var pk=progs[pb], onP=(S.prog===pk);
+    h+='<button onclick="setProgram(\''+pk+'\')" style="flex:1;padding:13px 2px;border-radius:12px;border:none;background:'+(onP?CLR.work.m:SOFT)+';color:'+(onP?"#fff":DM)+';font-size:12px;font-weight:'+(onP?600:500)+';">'+PROG_NAMES[pk]+'</button>';
+  }
+  h+='</div>'
     + '</div>'
     + '<div style="background:'+SF+';border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(58,51,42,0.06);">'
     + '<p style="font-size:11px;color:'+DM+';margin:0 0 10px;text-transform:uppercase;letter-spacing:0.1em;">Séance du jour</p>';
@@ -240,7 +319,7 @@ function renderGuide(){
     + '<div style="max-width:400px;margin:0 auto;">'
     + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">'
     + '<button onclick="goHome()" style="background:'+SF+';border:none;color:'+TX+';font-size:18px;width:40px;height:40px;border-radius:12px;box-shadow:0 2px 8px rgba(58,51,42,0.08);">\u2190</button>'
-    + '<h1 style="font-size:21px;font-weight:700;margin:0;color:'+TX+';">Guide - '+(S.prog==="bas"?"Bas du corps":"Haut du corps")+'</h1>'
+    + '<h1 style="font-size:21px;font-weight:700;margin:0;color:'+TX+';">Guide - '+PROG_NAMES[S.prog]+'</h1>'
     + '</div>';
   for(var i=0;i<EX.length;i++){
     var e=EX[i];
@@ -315,7 +394,7 @@ function renderSession(){
   var pc = CLR[S.phase]||CLR.work;
   var showIdx = (S.phase==="restEx" && S.exIdx+1<EX.length) ? S.exIdx+1 : S.exIdx;
   var showEx = EX[showIdx];
-  var phLabel = S.phase==="work" ? "TRAVAIL" : "REPOS";
+  var phLabel = S.phase==="work" ? (S.prog==="sou"?"\u00C9TIREMENT":"TRAVAIL") : "REPOS";
   var isNext = (S.phase==="restEx" && S.exIdx+1<EX.length);
   var mins=Math.floor(S.tl/60), secs=S.tl%60;
   var display = mins>0 ? mins+":"+String(secs).padStart(2,"0") : String(S.tl);
@@ -401,7 +480,7 @@ function advance(){
   if(S.phase==="work"){
     if(S.setIdx<l.s-1){ go("restSet", S.exIdx, S.setIdx, l.r); }
     else if(S.exIdx<EX.length-1){ go("restEx", S.exIdx, S.setIdx, REST_EX); }
-    else { setTimeout(function(){ vibe([300,100,300,100,500]); }, 900); S.done=true; renderSession(); }
+    else { setTimeout(function(){ vibe([300,100,300,100,500]); }, 900); S.done=true; saveSession(); renderSession(); }
   } else if(S.phase==="restSet"){
     go("work", S.exIdx, S.setIdx+1, LVL[S.exIdx][S.week-1].w);
   } else if(S.phase==="restEx"){
@@ -441,6 +520,8 @@ function beginSession(){
 function goHome(){ clearInterval(timer); S.screen="home"; S.done=false; S.running=false; renderHome(); }
 
 applyProgram();
+var _sug=suggestNext();
+if(_sug){ S.prog=_sug.prog; applyProgram(); }
 renderHome();
 </script>
 </body>
