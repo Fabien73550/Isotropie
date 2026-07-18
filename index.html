@@ -86,12 +86,12 @@ var LVL_ALL = [
   [{s:4,w:20,r:15},{s:4,w:30,r:15},{s:4,w:40,r:15}],
   [{s:3,w:30,r:30},{s:3,w:45,r:30},{s:4,w:60,r:30}],
   [{s:3,w:20,r:20},{s:3,w:30,r:20},{s:4,w:40,r:20}],
-  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}],
-  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}],
-  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}],
-  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}],
-  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}],
-  [{s:2,w:30,r:10},{s:2,w:45,r:10},{s:2,w:60,r:10}]
+  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:10}],
+  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:10}],
+  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:10}],
+  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:10}],
+  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:10}],
+  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:10}]
 ];
 
 // ── Composition + ORDRE de chaque programme (indices dans EX_ALL) ────────────────────
@@ -103,6 +103,7 @@ var PROG = {
   sou:  [10, 11, 12, 13, 14, 15] // Squat Profond, Chien Tete en Bas, Fente Psoas, Pigeon, Ouverture Thoracique, Torsion
 };
 var PROG_NAMES = { bas:"Bas du corps", haut:"Haut du corps", sou:"Souplesse" };
+var LVL_NAMES = ["Débutant","Médium","Pro"];
 
 // ── Vues ordonnees selon le programme actif (remplies par applyProgram) ─────────────
 var EX = [], LVL = [];
@@ -153,9 +154,10 @@ for(var gi=0; gi<EX_ALL.length; gi++){ EX_ALL[gi].cues=GUIDE[gi].cues; EX_ALL[gi
 // ── Palette (fond beige chaud + tons C harmonises) ───────────────────────────────
 var CLR = {
   work:    { m:"#1E5FA3", d:"#CBB99E", g:"rgba(30,95,163,0.25)" },
-  restSet: { m:"#0A8A63", d:"#CBB99E", g:"rgba(10,138,99,0.25)" },
+  restSet: { m:"#9B7BD4", d:"#CBB99E", g:"rgba(155,123,212,0.25)" },
   restEx:  { m:"#6B4FB8", d:"#CBB99E", g:"rgba(107,79,184,0.25)" }
 };
+var GOOD = { m:"#0A8A63", g:"rgba(10,138,99,0.25)" };
 var BG   = "#F2E9DC";
 var SF   = "#FBF6EE";
 var TX   = "#3A332A";
@@ -220,6 +222,35 @@ function daysAgoTxt(dstr){
   if(diff===1) return "hier";
   return "il y a "+diff+" jours";
 }
+
+// ── Reprise apres coupure : sauvegarde de l'etat de seance ──
+var SAVE_KEY="iso_resume";
+function saveState(){
+  try{
+    if(!S.running||S.done) return;
+    localStorage.setItem(SAVE_KEY, JSON.stringify({week:S.week,prog:S.prog,exIdx:S.exIdx,setIdx:S.setIdx,phase:S.phase,tl:S.tl,ts:Date.now()}));
+  }catch(e){}
+}
+function clearState(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
+function loadState(){
+  try{
+    var d=JSON.parse(localStorage.getItem(SAVE_KEY)||"null");
+    if(!d||typeof d.tl!=="number"||!PROG[d.prog]) return null;
+    if(Date.now()-d.ts > 6*3600*1000){ clearState(); return null; }
+    return d;
+  }catch(e){ return null; }
+}
+function resumeSession(){
+  var d=loadState(); if(!d){ renderHome(); return; }
+  getCtx();
+  S.week=d.week; S.prog=d.prog; applyProgram();
+  S.exIdx=Math.min(d.exIdx,EX.length-1); S.setIdx=d.setIdx; S.phase=d.phase; S.tl=d.tl;
+  S.done=false; S.running=true; S.paused=true; S.screen="session";
+  renderSession();
+  startTick();
+}
+function dismissResume(){ clearState(); renderHome(); }
+
 var app = document.getElementById("app");
 
 // ── Horloge a aiguille (SVG) ─────────────────────────────────────────────────────
@@ -251,32 +282,41 @@ function totalMin(){
   return Math.round(t/60);
 }
 function renderHome(){
-  var labels=["Débutant","Intermédiaire","Avancé"];
   var h='<div style="min-height:100vh;background:'+BG+';color:'+TX+';padding:24px 16px;">'
     + '<div style="max-width:400px;margin:0 auto;">'
     + '<div style="text-align:center;margin-bottom:24px;">'
     + '<p style="font-size:11px;color:'+DM+';margin:0 0 6px;letter-spacing:0.18em;text-transform:uppercase;">Programme Isométrique</p>'
     + '<h1 style="font-size:27px;font-weight:700;margin:0;letter-spacing:-0.02em;color:'+TX+';">Remise en Forme</h1>'
-    + '</div>'
-    + '<div style="background:'+SF+';border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(58,51,42,0.06);">'
-    + '<p style="font-size:11px;color:'+DM+';margin:0 0 10px;text-transform:uppercase;letter-spacing:0.1em;">Semaine</p>'
+    + '</div>';
+  var rs=loadState();
+  if(rs){
+    h+='<div style="background:'+CLR.restEx.g+';border:1.5px solid '+CLR.restEx.m+';border-radius:14px;padding:12px 14px;margin-bottom:14px;">'
+      + '<p style="margin:0;font-size:12px;color:'+TX+';line-height:1.5;">\u23F8 <strong>S\u00e9ance interrompue : '+PROG_NAMES[rs.prog]+'</strong><br>'
+      + '<span style="color:'+DM+';">Exercice '+(rs.exIdx+1)+'/'+PROG[rs.prog].length+' \u2014 s\u00e9rie '+(rs.setIdx+1)+'</span></p>'
+      + '<div style="display:flex;gap:8px;margin-top:9px;">'
+      + '<button onclick="resumeSession()" style="flex:1;padding:9px 0;border-radius:10px;border:none;background:'+CLR.restEx.m+';color:#fff;font-size:12px;font-weight:700;">\u25B6 Reprendre</button>'
+      + '<button onclick="dismissResume()" style="flex:1;padding:9px 0;border-radius:10px;border:none;background:'+SOFT+';color:'+DM+';font-size:12px;font-weight:600;">Ignorer</button>'
+      + '</div></div>';
+  }
+  h+='<div style="background:'+SF+';border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(58,51,42,0.06);">'
+    + '<p style="font-size:11px;color:'+DM+';margin:0 0 10px;text-transform:uppercase;letter-spacing:0.1em;">Niveau</p>'
     + '<div style="display:flex;gap:8px;margin-bottom:10px;">';
   for(var w=1;w<=3;w++){
     var on=S.week===w;
-    h+='<button onclick="setWeek('+w+')" style="flex:1;padding:13px 0;border-radius:12px;border:none;background:'+(on?CLR.work.m:SOFT)+';color:'+(on?"#fff":DM)+';font-size:14px;font-weight:'+(on?600:500)+';">Sem. '+w+'</button>';
+    h+='<button onclick="setWeek('+w+')" style="flex:1;padding:13px 0;border-radius:12px;border:none;background:'+(on?CLR.work.m:SOFT)+';color:'+(on?"#fff":DM)+';font-size:14px;font-weight:'+(on?600:500)+';">'+LVL_NAMES[w-1]+'</button>';
   }
   h+='</div>'
-    + '<p style="font-size:12px;color:'+DM+';margin:0;text-align:center;">'+labels[S.week-1]+' - environ <strong style="color:'+TX+';">'+totalMin()+' min</strong></p>'
+    + '<p style="font-size:12px;color:'+DM+';margin:0;text-align:center;">Durée : environ <strong style="color:'+TX+';">'+totalMin()+' min</strong></p>'
     + '</div>'
     + '<div style="background:'+SF+';border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(58,51,42,0.06);">'
     + '<p style="font-size:11px;color:'+DM+';margin:0 0 10px;text-transform:uppercase;letter-spacing:0.1em;">Programme du jour</p>';
   var sug=suggestNext();
   if(sug){
     var okS=(S.prog===sug.prog);
-    h+='<div style="background:'+(okS?CLR.restSet.g:SOFT)+';border-radius:12px;padding:11px 13px;margin-bottom:10px;'+(okS?"border:1.5px solid "+CLR.restSet.m+";":"")+'">'
+    h+='<div style="background:'+(okS?GOOD.g:SOFT)+';border-radius:12px;padding:11px 13px;margin-bottom:10px;'+(okS?"border:1.5px solid "+GOOD.m+";":"")+'">'
       + '<p style="margin:0;font-size:12px;color:'+TX+';line-height:1.5;">\uD83D\uDCA1 <strong>Suggestion : '+PROG_NAMES[sug.prog]+'</strong><br>'
       + '<span style="color:'+DM+';">Dernière séance : '+PROG_NAMES[sug.last.p]+' ('+daysAgoTxt(sug.last.d)+')</span></p>'
-      + (okS?'':'<button onclick="setProgram(\''+sug.prog+'\')" style="margin-top:8px;padding:8px 14px;border-radius:10px;border:none;background:'+CLR.restSet.m+';color:#fff;font-size:12px;font-weight:700;">Choisir '+PROG_NAMES[sug.prog]+'</button>')
+      + (okS?'':'<button onclick="setProgram(\''+sug.prog+'\')" style="margin-top:8px;padding:8px 14px;border-radius:10px;border:none;background:'+GOOD.m+';color:#fff;font-size:12px;font-weight:700;">Choisir '+PROG_NAMES[sug.prog]+'</button>')
       + '</div>';
   }
   h+='<div style="display:flex;gap:8px;">';
@@ -302,7 +342,7 @@ function renderHome(){
       + '</div>';
   }
   h+='</div>'
-    + '<button onclick="prepareSession()" style="width:100%;padding:17px;border-radius:16px;border:none;background:'+CLR.work.m+';color:#fff;font-size:15px;font-weight:700;letter-spacing:0.06em;box-shadow:0 6px 24px rgba(30,95,163,0.35);">DÉMARRER - Semaine '+S.week+'</button>'
+    + '<button onclick="prepareSession()" style="width:100%;padding:17px;border-radius:16px;border:none;background:'+CLR.work.m+';color:#fff;font-size:15px;font-weight:700;letter-spacing:0.06em;box-shadow:0 6px 24px rgba(30,95,163,0.35);">DÉMARRER - '+LVL_NAMES[S.week-1]+'</button>'
     + '<button onclick="showGuide()" style="width:100%;padding:14px;border-radius:14px;border:1.5px solid '+CLR.work.m+';background:'+SF+';color:'+CLR.work.m+';font-size:14px;font-weight:600;margin-top:12px;">\uD83D\uDCD6  Guide des postures</button>'
     + '<div style="display:flex;gap:16px;justify-content:center;margin-top:18px;flex-wrap:wrap;">';
   var leg=[["Travail","work"],["Repos série","restSet"],["Repos exercice","restEx"]];
@@ -328,7 +368,7 @@ function renderGuide(){
     for(var w=0;w<3;w++){
       var on=(S.week===w+1);
       cons+='<div style="flex:1;text-align:center;padding:9px 4px;border-radius:11px;background:'+(on?CLR.work.m:SOFT)+';">'
-        + '<div style="font-size:9px;color:'+(on?"rgba(255,255,255,0.85)":DM)+';text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Sem. '+(w+1)+'</div>'
+        + '<div style="font-size:9px;color:'+(on?"rgba(255,255,255,0.85)":DM)+';text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">'+LVL_NAMES[w]+'</div>'
         + '<div style="font-size:13px;font-weight:700;margin-top:3px;color:'+(on?"#fff":TX)+';">'+wk[w].s+'\u00D7'+wk[w].w+'s</div>'
         + '<div style="font-size:10px;margin-top:1px;color:'+(on?"rgba(255,255,255,0.85)":DM)+';">repos '+wk[w].r+'s</div>'
         + '</div>';
@@ -355,7 +395,7 @@ function renderGuide(){
       + '<p style="margin:0;font-size:13px;color:'+TX+';line-height:1.55;">'+e.resp+'</p>'
       + '</div>'
       + '<div style="margin-bottom:12px;">'
-      + '<p style="margin:0 0 3px;font-size:10px;color:'+CLR.restSet.m+';text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">Ce que ça fait</p>'
+      + '<p style="margin:0 0 3px;font-size:10px;color:'+GOOD.m+';text-transform:uppercase;letter-spacing:0.1em;font-weight:700;">Ce que ça fait</p>'
       + '<p style="margin:0;font-size:13px;color:'+TX+';line-height:1.55;">'+e.eff+'</p>'
       + '</div>'
       + '<div style="padding-top:12px;border-top:1px solid '+SOFT+';">'
@@ -375,7 +415,7 @@ function renderReady(){
   var l=LVL[0][S.week-1];
   var h='<div style="min-height:100vh;background:'+BG+';color:'+TX+';display:flex;align-items:center;justify-content:center;padding:24px 16px;">'
     + '<div style="max-width:400px;width:100%;text-align:center;">'
-    + '<p style="font-size:11px;color:'+DM+';margin:0 0 4px;text-transform:uppercase;letter-spacing:0.14em;">Semaine '+S.week+' - Premier exercice</p>'
+    + '<p style="font-size:11px;color:'+DM+';margin:0 0 4px;text-transform:uppercase;letter-spacing:0.14em;">'+LVL_NAMES[S.week-1]+' - Premier exercice</p>'
     + '<div style="font-size:56px;line-height:1.1;margin:10px 0;">'+e.em+'</div>'
     + '<h2 style="margin:2px 0 2px;font-size:23px;font-weight:600;color:'+TX+';">'+e.name+'</h2>'
     + '<p style="margin:0 0 6px;font-size:26px;color:'+ZH+';font-weight:700;">'+e.zh+'</p>'
@@ -455,7 +495,7 @@ function renderDone(){
     + '<div>'
     + '<div style="font-size:72px;margin-bottom:16px;">\uD83C\uDF89</div>'
     + '<h2 style="color:'+TX+';margin:0 0 8px;font-size:26px;font-weight:700;">Séance terminee !</h2>'
-    + '<p style="color:'+CLR.work.m+';margin:0 0 4px;font-weight:600;">Semaine '+S.week+' - Bravo !</p>'
+    + '<p style="color:'+CLR.work.m+';margin:0 0 4px;font-weight:600;">'+LVL_NAMES[S.week-1]+' - Bravo !</p>'
     + '<p style="color:'+DM+';font-size:13px;margin:0 0 32px;">Hydrate-toi et prends 5 min pour t\'etirer.</p>'
     + '<button onclick="goHome()" style="padding:15px 44px;border-radius:14px;border:none;background:'+CLR.work.m+';color:#fff;font-size:15px;font-weight:700;box-shadow:0 6px 20px '+CLR.work.g+';">Retour</button>'
     + '</div></div>';
@@ -470,7 +510,7 @@ function startTick(){
     if(next>=5 && next<=10){ playBip(880,0.10,0.28); }
     else if(next>=1 && next<=4){ playBip(UP_NOTES[next],0.16,0.32); }
     if(next<=0){ S.tl=0; playZero(); clearInterval(timer); advance(); }
-    else { S.tl=next; renderSession(); 
+    else { S.tl=next; renderSession(); saveState();
       var el=document.getElementById('count-display');
       if(el){ el.classList.add('changed'); setTimeout(function(){ if(el) el.classList.remove('changed'); },280); } }
   },1000);
@@ -480,7 +520,7 @@ function advance(){
   if(S.phase==="work"){
     if(S.setIdx<l.s-1){ go("restSet", S.exIdx, S.setIdx, l.r); }
     else if(S.exIdx<EX.length-1){ go("restEx", S.exIdx, S.setIdx, REST_EX); }
-    else { setTimeout(function(){ vibe([300,100,300,100,500]); }, 900); S.done=true; saveSession(); renderSession(); }
+    else { setTimeout(function(){ vibe([300,100,300,100,500]); }, 900); S.done=true; saveSession(); clearState(); renderSession(); }
   } else if(S.phase==="restSet"){
     go("work", S.exIdx, S.setIdx+1, LVL[S.exIdx][S.week-1].w);
   } else if(S.phase==="restEx"){
@@ -491,6 +531,7 @@ function go(phase, exIdx, setIdx, tl){
   S.phase=phase; S.exIdx=exIdx; S.setIdx=setIdx; S.tl=tl; S.paused=false;
   vibe(80);
   renderSession();
+  saveState();
   startTick();
 }
 function togglePause(){ S.paused=!S.paused; renderSession(); }
@@ -504,6 +545,7 @@ function showGuide(){ clearInterval(timer); S.screen="guide"; renderGuide(); }
 function prepareSession(){
   getCtx();
   clearInterval(timer);
+  clearState();
   S.screen="ready"; S.exIdx=0; S.setIdx=0; S.phase="work"; S.tl=LVL[0][S.week-1].w; S.paused=false; S.done=false; S.running=false;
   renderReady();
 }
@@ -514,6 +556,7 @@ function beginSession(){
   S.phase="work"; S.tl=LVL[0][S.week-1].w; S.paused=false;
   playStart();
   renderSession();
+  saveState();
   // le chrono demarre seulement a la fin du biiiip
   setTimeout(function(){ vibe(80); startTick(); }, START_DURATION);
 }
