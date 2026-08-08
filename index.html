@@ -86,12 +86,12 @@ var LVL_ALL = [
   [{s:4,w:20,r:15},{s:4,w:30,r:15},{s:4,w:40,r:15}],
   [{s:3,w:30,r:30},{s:3,w:45,r:30},{s:4,w:60,r:30}],
   [{s:3,w:20,r:20},{s:3,w:30,r:20},{s:4,w:40,r:20}],
-  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:10}],
-  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:10}],
-  [{s:4,w:30,r:10},{s:4,w:45,r:10},{s:4,w:60,r:10}],
-  [{s:4,w:30,r:10},{s:4,w:45,r:10},{s:4,w:60,r:10}],
-  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:10}],
-  [{s:4,w:30,r:10},{s:4,w:45,r:10},{s:4,w:60,r:10}]
+  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:15}],
+  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:15}],
+  [{s:4,w:30,r:10},{s:4,w:45,r:10},{s:4,w:60,r:15}],
+  [{s:4,w:30,r:10},{s:4,w:45,r:10},{s:4,w:60,r:15}],
+  [{s:3,w:30,r:10},{s:3,w:45,r:10},{s:3,w:60,r:15}],
+  [{s:4,w:30,r:10},{s:4,w:45,r:10},{s:4,w:60,r:15}]
 ];
 
 // ── Composition + ORDRE de chaque programme (indices dans EX_ALL) ────────────────────
@@ -410,6 +410,23 @@ function renderGuide(){
 }
 
 // ── Ecran pret (demarrage manuel) ────────────────────────────────────────────────
+// ── Bloc guide de la posture (bouton + panneau depliant) ─────────────────────────
+function guideBlock(ex, pc){
+  var b = '<button onclick="toggleInfo()" style="margin-top:8px;padding:8px 16px;border-radius:20px;border:1.5px solid '+pc.m+';background:'+(S.showInfo?pc.m:SF)+';color:'+(S.showInfo?"#fff":pc.m)+';font-size:12px;font-weight:600;">\u2139\uFE0F  '+(S.showInfo?"Masquer le guide":"Comment faire")+'</button>';
+  if(!S.showInfo) return b;
+  function sec(lbl,col,txt){ return '<p style="margin:0 0 3px;font-size:10px;color:'+col+';text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">'+lbl+'</p>'
+    + '<p style="margin:0 0 10px;font-size:13px;color:'+TX+';line-height:1.55;">'+txt+'</p>'; }
+  b += '<div style="text-align:left;background:'+SF+';border-radius:14px;padding:14px 16px;margin-top:10px;box-shadow:0 4px 16px rgba(58,51,42,0.08);">'
+    + sec("Comment faire", DM, ex.desc)
+    + sec("Points cl\u00e9s", CLR.restEx.m, ex.cues)
+    + sec("Respiration", DM, ex.resp)
+    + sec("Ce que \u00e7a fait", GOOD.m, ex.eff)
+    + (S.screen==="session" ? '<p style="margin:0 0 10px;font-size:11px;color:'+CLR.restEx.m+';font-weight:700;text-align:center;">\u23F8 Chrono en pause pendant la lecture</p>' : '')
+    + '<button onclick="toggleInfo()" style="width:100%;padding:11px 0;border-radius:11px;border:none;background:'+CLR.work.m+';color:#fff;font-size:12px;font-weight:700;">'+(S.screen==="session"?"Fermer et reprendre":"Fermer")+'</button>'
+    + '</div>';
+  return b;
+}
+
 function renderReady(){
   var e=EX[0];
   var l=LVL[0][S.week-1];
@@ -419,7 +436,9 @@ function renderReady(){
     + '<div style="font-size:56px;line-height:1.1;margin:10px 0;">'+e.em+'</div>'
     + '<h2 style="margin:2px 0 2px;font-size:23px;font-weight:600;color:'+TX+';">'+e.name+'</h2>'
     + '<p style="margin:0 0 6px;font-size:26px;color:'+ZH+';font-weight:700;">'+e.zh+'</p>'
-    + '<p style="margin:0 0 28px;font-size:13px;color:'+DM+';">'+l.s+' séries x '+l.w+'s - repos '+l.r+'s</p>'
+    + '<p style="margin:0 0 10px;font-size:13px;color:'+DM+';">'+l.s+' séries x '+l.w+'s - repos '+l.r+'s</p>'
+    + guideBlock(e, CLR.work)
+    + '<div style="height:22px;"></div>'
     + '<button onclick="beginSession()" style="width:100%;padding:18px;border-radius:16px;border:none;background:'+CLR.work.m+';color:#fff;font-size:16px;font-weight:700;letter-spacing:0.08em;box-shadow:0 6px 22px '+CLR.work.g+';">\u25B6  COMMENCER</button>'
     + '<button onclick="goHome()" style="width:100%;padding:13px;border-radius:14px;border:none;background:transparent;color:'+DM+';font-size:13px;font-weight:500;margin-top:10px;">Retour</button>'
     + '</div></div>';
@@ -477,8 +496,7 @@ function renderSession(){
     + '<div style="font-size:46px;line-height:1.1;margin-bottom:4px;">'+showEx.em+'</div>'
     + '<h2 style="margin:2px 0 2px;font-size:21px;font-weight:600;color:'+TX+';">'+showEx.name+'</h2>'
     + '<p style="margin:0;font-size:24px;color:'+ZH+';font-weight:700;line-height:1.1;">'+showEx.zh+'</p>'
-    + (S.prog==="sou" ? '<button onclick="toggleInfo()" style="margin-top:8px;padding:7px 14px;border-radius:20px;border:1.5px solid '+pc.m+';background:'+(S.showInfo?pc.m:SF)+';color:'+(S.showInfo?"#fff":pc.m)+';font-size:12px;font-weight:600;">ℹ️  Comment faire</button>' : '')
-    + (S.prog==="sou" && S.showInfo ? '<div style="text-align:left;background:'+SF+';border-radius:14px;padding:14px 16px;margin-top:10px;box-shadow:0 4px 16px rgba(58,51,42,0.08);"><p style="margin:0 0 8px;font-size:13px;color:'+TX+';line-height:1.5;">'+showEx.desc+'</p><p style="margin:0;font-size:10px;color:'+CLR.restEx.m+';text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Point clé</p><p style="margin:2px 0 0;font-size:13px;color:'+TX+';line-height:1.5;">'+showEx.cues+'</p></div>' : '')
+    + guideBlock(showEx, pc)
     + '</div>'
     + '<div style="text-align:center;margin-bottom:18px;">'
     + '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:6px;">'+bars+'</div>'
@@ -530,14 +548,22 @@ function advance(){
   }
 }
 function go(phase, exIdx, setIdx, tl){
-  S.phase=phase; S.exIdx=exIdx; S.setIdx=setIdx; S.tl=tl; S.paused=false; S.showInfo=false;
+  S.phase=phase; S.exIdx=exIdx; S.setIdx=setIdx; S.tl=tl; S.paused=false; S.showInfo=false; _pauseByInfo=false;
   vibe(80);
   renderSession();
   saveState();
   startTick();
 }
 function togglePause(){ S.paused=!S.paused; renderSession(); }
-function toggleInfo(){ S.showInfo=!S.showInfo; renderSession(); }
+var _pauseByInfo=false;
+function toggleInfo(){
+  S.showInfo=!S.showInfo;
+  if(S.screen==="ready"){ renderReady(); return; }
+  // Ouvrir le guide met le chrono en pause : on lit sans perdre de temps
+  if(S.showInfo){ if(!S.paused){ S.paused=true; _pauseByInfo=true; } }
+  else if(_pauseByInfo){ S.paused=false; _pauseByInfo=false; }
+  renderSession();
+}
 function quitSession(){ clearInterval(timer); S.running=false; goHome(); }
 
 // ── Navigation ───────────────────────────────────────────────────────────────────
@@ -549,7 +575,7 @@ function prepareSession(){
   getCtx();
   clearInterval(timer);
   clearState();
-  S.screen="ready"; S.exIdx=0; S.setIdx=0; S.phase="work"; S.tl=LVL[0][S.week-1].w; S.paused=false; S.done=false; S.running=false;
+  S.screen="ready"; S.exIdx=0; S.setIdx=0; S.phase="work"; S.tl=LVL[0][S.week-1].w; S.paused=false; S.done=false; S.running=false; S.showInfo=false;
   renderReady();
 }
 // begin : c'est ici que TOI tu lances le timer
